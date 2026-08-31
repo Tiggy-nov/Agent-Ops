@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hoistway-audit"
+version = "0.1.0"
+description = "A read-only 48-hour redundancy audit for agent fleets"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [{name = "Hoistway"}]
+
+[project.scripts]
+hoistway-audit = "hoistway_audit.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["hoistway_audit*"]
+
+[tool.setuptools.package-data]
+hoistway_audit = ["static/*"]

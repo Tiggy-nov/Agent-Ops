@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c1015" />
+    <title>Hoistway | Redundancy audit</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230c1015'/%3E%3Cpath d='M18 15v34M46 15v34M18 32h28' stroke='%23edf2f6' stroke-width='6'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script src="/assets/app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <a class="wordmark" href="/">
+        <span class="mark" aria-hidden="true"><i></i><i></i><b></b></span>
+        <span>HOISTWAY</span>
+      </a>
+      <span class="product">48-hour redundancy audit</span>
+      <span class="mode">Read-only</span>
+    </header>
+
+    <main>
+      <section class="report-header">
+        <div>
+          <p class="label">Audit result</p>
+          <h1>Cross-session tool-result redundancy</h1>
+          <p class="summary">Observed reuse potential without changing agent behaviour.</p>
+        </div>
+        <div class="progress-block">
+          <div class="progress-copy"><span id="status-text">Collecting</span><span id="elapsed">0 / 48 hours</span></div>
+          <div class="progress-track"><span id="progress"></span></div>
+        </div>
+      </section>
+
+      <section class="answer" aria-labelledby="answer-heading">
+        <div>
+          <p class="label" id="answer-heading">The answer</p>
+          <strong id="removable-time">0 ms</strong>
+          <p>observed tool latency could have been removed</p>
+        </div>
+        <div class="answer-share">
+          <strong id="removable-share">0%</strong>
+          <p>of measured tool round-trip latency</p>
+        </div>
+      </section>
+
+      <section class="coverage" aria-label="Audit coverage">
+        <article><span>Tool calls</span><strong id="tool-calls">0</strong></article>
+        <article><span>Agent sessions</span><strong id="sessions">0</strong></article>
+        <article><span>Observed tools</span><strong id="tools">0</strong></article>
+        <article><span>Eligible repeats</span><strong id="eligible-repeats">0</strong></article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Measured candidates</h2>
+            <p>Only exact cross-session calls are compared.</p>
+          </div>
+          <div class="key"><span class="key-eligible"></span> Eligible <span class="key-excluded"></span> Excluded</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Tool pattern</th><th>Calls</th><th>Sessions</th><th>Output stability</th><th>Median latency</th><th>Removable</th><th>Decision</th></tr>
+            </thead>
+            <tbody id="candidate-body"></tbody>
+          </table>
+          <div class="empty" id="empty" hidden>
+            <strong>No repeated tool calls observed yet.</strong>
+            <p>Point agent traffic at this proxy and set a session identifier.</p>
+            <button id="seed" type="button">Load demonstration data</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="guardrails">
+        <div><span>Traffic modified</span><strong>No</strong></div>
+        <div><span>Raw payloads stored</span><strong>No</strong></div>
+        <div><span>Output match required</span><strong>Yes</strong></div>
+        <div><span>Mutating tools included</span><strong>No</strong></div>
+      </section>
+    </main>
+
+    <footer><span>Hoistway</span><span>Measurement instrument, not a cache</span></footer>
+  </body>
+</html>
