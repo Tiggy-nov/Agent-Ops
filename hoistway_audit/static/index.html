@@ -34,21 +34,53 @@
 
       <section class="answer" aria-labelledby="answer-heading">
         <div>
-          <p class="label" id="answer-heading">The answer</p>
-          <strong id="removable-time">0 ms</strong>
-          <p>observed tool latency could have been removed</p>
+          <p class="label" id="answer-heading">Cross-session repetition</p>
+          <strong id="cross-session-rate">0%</strong>
+          <p>of non-mutating, session-scoped tool calls repeated across agent sessions</p>
         </div>
         <div class="answer-share">
-          <strong id="removable-share">0%</strong>
-          <p>of measured tool round-trip latency</p>
+          <strong id="repeat-share">0%</strong>
+          <p>of all tool calls were stable, cross-session reuse candidates</p>
         </div>
+      </section>
+
+      <section class="coverage repetition" aria-label="Repetition split">
+        <article><span>Cross-session repeat rate</span><strong id="cross-repeat">0%</strong></article>
+        <article><span>Within-session repeat rate</span><strong id="within-repeat">0%</strong></article>
+        <article><span>Total repeat rate</span><strong id="total-repeat">0%</strong></article>
+        <article><span>Stable eligible repeats</span><strong id="eligible-repeats">0</strong></article>
       </section>
 
       <section class="coverage" aria-label="Audit coverage">
         <article><span>Tool calls</span><strong id="tool-calls">0</strong></article>
         <article><span>Agent sessions</span><strong id="sessions">0</strong></article>
         <article><span>Observed tools</span><strong id="tools">0</strong></article>
-        <article><span>Eligible repeats</span><strong id="eligible-repeats">0</strong></article>
+        <article><span>Dropped: no session ID</span><strong id="unscoped-calls">0</strong></article>
+      </section>
+
+      <section class="panel timing-panel">
+        <div class="panel-heading">
+          <div><h2>Observed tool-boundary range</h2><p>Secondary timing context, not end-to-end latency saved.</p></div>
+        </div>
+        <div class="timing-grid">
+          <div><span>Lower bound</span><strong id="lower-bound">0 ms</strong></div>
+          <div><span>Upper bound</span><strong id="upper-bound">0 ms</strong></div>
+          <div><span>Eligible calls in multi-call batches</span><strong id="multi-batch-share">0%</strong></div>
+        </div>
+        <p class="batch-distribution" id="batch-distribution"></p>
+        <p class="caveat" id="timing-caveat"></p>
+      </section>
+
+      <section class="panel stability-panel">
+        <div class="panel-heading">
+          <div><h2>Output stability by reuse window</h2><p>Exact and near-identical rates are shown separately.</p></div>
+        </div>
+        <div class="table-wrap">
+          <table class="stability-table">
+            <thead><tr><th>Tool</th><th>Signal</th><th>30s</th><th>1m</th><th>5m</th><th>10m</th><th>1h</th><th>6h</th><th>24h</th><th>Safe window</th></tr></thead>
+            <tbody id="stability-body"></tbody>
+          </table>
+        </div>
       </section>
 
       <section class="panel">
@@ -62,7 +94,7 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>Tool pattern</th><th>Calls</th><th>Sessions</th><th>Output stability</th><th>Median latency</th><th>Removable</th><th>Decision</th></tr>
+              <tr><th>Tool pattern</th><th>Calls</th><th>Sessions</th><th>Output stability</th><th>Median boundary</th><th>Repeated boundary</th><th>Decision</th></tr>
             </thead>
             <tbody id="candidate-body"></tbody>
           </table>
@@ -79,6 +111,25 @@
         <div><span>Raw payloads stored</span><strong>No</strong></div>
         <div><span>Output match required</span><strong>Yes</strong></div>
         <div><span>Mutating tools included</span><strong>No</strong></div>
+      </section>
+
+      <section class="panel rules-panel">
+        <div class="panel-heading">
+          <div><h2>Canonicalisation assumptions</h2><p>Every equivalence rule used before argument digesting.</p></div>
+        </div>
+        <dl id="rules"></dl>
+      </section>
+
+      <section class="panel verdict-panel">
+        <div class="panel-heading">
+          <div><h2>Pre-registered verdicts</h2><p>Thresholds fixed before the audit begins.</p></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Criterion</th><th>Measured</th><th>Threshold</th><th>Verdict</th></tr></thead>
+            <tbody id="verdict-body"></tbody>
+          </table>
+        </div>
       </section>
     </main>
 

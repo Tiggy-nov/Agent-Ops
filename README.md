@@ -6,7 +6,7 @@ Hoistway is a read-only reverse proxy that a team places in front of its model A
 
 At the end of the audit, it answers one question:
 
-> How much observed end-to-end tool latency could a cross-session tool-result cache remove without changing what our agents do?
+> How much of this fleet's tool work is repeated across sessions with identical results?
 
 This repository is the measurement instrument. It is not a cache and it does not alter agent execution.
 
@@ -18,26 +18,50 @@ When an agent model emits a tool call, Hoistway records:
 - The agent session identifier
 - When the tool call was emitted
 
+Arguments are canonicalised before digesting: object keys are recursively sorted, string whitespace is collapsed, declared nonce keys are removed, and URLs are normalised by host, fragment and query parameters. The exact dropped keys and stripped tracking parameters are constants in source and are printed in every report so an operator can audit the equivalence assumptions.
+
 When the tool output is sent back to the model, Hoistway records:
 
 - A keyed digest of the output
-- The observed tool round-trip latency
+- The observed tool-boundary interval
 - Payload sizes, not payload contents
 
-The report only classifies a repeated call as eligible when:
+The report stores one fixed-width row for every observed repeat and builds a stability curve over 30-second, 1-minute, 5-minute, 10-minute, 1-hour, 6-hour and 24-hour gaps. Each tool receives an observed safe reuse window: the largest measured window where at least 95% of repeat outputs were near-identical.
+
+Before discarding each output payload, Hoistway records a 64-bit SimHash over token 3-shingles. When JSON output contains URLs, it also records a keyed digest of the sorted URL set. The stability table reports exact and near-identical rates separately; no raw output is retained.
+
+A repeated call is eligible when:
 
 1. The same normalised call appears in at least two different sessions.
-2. Every observed output digest matches.
+2. Its output matches the preceding result inside that tool's observed safe reuse window.
 3. The tool name does not appear to represent a mutation.
 
-This deliberately under-counts rather than over-claiming.
+This preserves the time dimension: a result can be stable over ten minutes without being assumed stable for six hours. The tool-boundary interval runs from model emission to result re-entry. It includes local framework and orchestration overhead, so it is reported only as secondary context and is not a claim about end-to-end latency saved.
+
+For that secondary timing context, Hoistway records how many tool calls appeared in each assistant turn and reports a range, never a point estimate:
+
+- Lower bound: a turn is counted only when every call in its batch is eligible.
+- Upper bound: eligible call intervals are summed as if tool execution were fully serial.
+
+The report also shows the batch-size distribution and the share of eligible calls in multi-call batches. A wide range means framework timing metadata or tool-side capture is needed to resolve concurrency.
+
+## Pre-registered decision thresholds
+
+The pass/fail bar is fixed in source before any audit data arrives. Every report ends with PASS or KILL for each criterion:
+
+| Criterion | Threshold |
+|---|---:|
+| Cross-session share of eligible repeated calls | at least 40% |
+| Output stability at a 10-minute reuse window | at least 95% |
+| Eligible calls as a share of all tool calls | at least 10% |
 
 ## Quick start
 
-Python 3.11 or newer is the only runtime requirement.
+Install the package on Python 3.11 or newer:
 
 ```sh
-python -m hoistway_audit
+python -m pip install -e .
+hoistway-audit
 ```
 
 By default:
@@ -47,7 +71,7 @@ By default:
 - Upstream: `https://api.openai.com`
 - Audit database: `./data/audit.db`
 
-Point an OpenAI-compatible client at the proxy and attach a stable session identifier:
+Point a model client at the proxy and attach a stable session identifier. For example, with an OpenAI-compatible client:
 
 ```python
 from openai import OpenAI
@@ -114,12 +138,10 @@ All other routes and methods are forwarded to `HOISTWAY_UPSTREAM_URL`.
 
 ## Supported capture formats
 
-The first release recognises OpenAI-compatible:
-
-- Chat Completions tool calls and `role: tool` outputs
-- Responses API `function_call` and `function_call_output` items
-- JSON responses
-- Server-sent event streams
+- OpenAI Chat Completions and Responses APIs
+- Anthropic Messages API `tool_use` and `tool_result` blocks
+- Gemini `functionCall` and `functionResponse` parts
+- JSON responses and server-sent event streams for all three formats
 
 The proxy forwards other traffic unchanged even when it cannot classify it.
 
@@ -130,18 +152,19 @@ The proxy forwards other traffic unchanged even when it cannot classify it.
 - Provider credentials are forwarded in memory and never written to the audit database.
 - Traffic is not rewritten, routed, cached, retried or reordered.
 - Mutation-like tool names are excluded from the eligible result.
-- Output equality is required for eligibility.
+- A tool-specific stability window and near-identical output evidence are required for eligibility; exact and near-identical rates remain separate in the report.
 - Cross-session repetition is required for eligibility.
 
 The automatic mutation classifier is a safety filter, not a formal proof of side-effect freedom. Any production recommendation still requires a human review of tool semantics and freshness requirements.
 
 ## Known MVP limits
 
-- Session identity must be supplied using `X-Hoistway-Session-ID`, `metadata.session_id`, `metadata.thread_id` or `user`.
-- Tool latency is measured from model emission until the tool result re-enters the model boundary. It includes local orchestration overhead around the tool.
+- Session identity must be supplied using `X-Hoistway-Session-ID`, `metadata.session_id` or `metadata.thread_id`. User identifiers are intentionally rejected because one user can span many sessions.
+- Calls without usable session identity are excluded and counted in report coverage.
+- `observed_tool_boundary_ms` spans model emission until the tool result re-enters the model boundary. It includes local orchestration overhead and does not identify actual tool execution time.
 - The counterfactual does not yet model cache lookup overhead, TTL expiry or partial equivalence.
 - Exact argument and output equality is intentionally stricter than semantic equivalence.
-- Streaming is relayed progressively, but the proxy currently uses a simple standard-library networking stack rather than a production edge proxy.
+- SSE is parsed incrementally while `httpx`, Starlette and Uvicorn relay upstream bytes asynchronously. The capture path does not buffer a streamed response.
 
 ## Tests
 

@@ -4,10 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hoistway-audit"
-version = "0.1.0"
+version = "0.2.0"
 description = "A read-only 48-hour redundancy audit for agent fleets"
 readme = "README.md"
 requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27,<1",
+  "starlette>=0.40,<1",
+  "uvicorn>=0.30,<1",
+]
 license = {text = "Apache-2.0"}
 authors = [{name = "Hoistway"}]
 
