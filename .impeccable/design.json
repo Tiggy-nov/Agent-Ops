@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-31T00:00:00Z",
+  "title": "Design System: Hoistway Audit",
+  "extensions": {
+    "colorMeta": {
+      "instrument-black": {
+        "role": "neutral",
+        "displayName": "Instrument Black",
+        "canonical": "#090c11",
+        "tonalRamp": ["#090c11", "#10151d", "#19212c", "#252e3a", "#344154", "#647184", "#909cac", "#eef3fa"]
+      },
+      "audit-blue": {
+        "role": "primary",
+        "displayName": "Audit Blue",
+        "canonical": "#7b9cff",
+        "tonalRamp": ["#11162b", "#1d2852", "#2c3e79", "#3e58a0", "#5575c8", "#7b9cff", "#b5c5ff", "#edf1ff"]
+      },
+      "pass-green": {
+        "role": "semantic",
+        "displayName": "Measured Pass",
+        "canonical": "#73d2a0",
+        "tonalRamp": ["#0c2118", "#153b2a", "#21583e", "#307653", "#459668", "#73d2a0", "#b3eccb", "#ecfbf3"]
+      },
+      "kill-red": {
+        "role": "semantic",
+        "displayName": "Measured Kill",
+        "canonical": "#ff8178",
+        "tonalRamp": ["#2b1110", "#4d1d1b", "#702b27", "#953a35", "#bd4f48", "#ff8178", "#ffb9b3", "#fff0ee"]
+      }
+    },
+    "typographyMeta": {
+      "display": {"displayName": "Technical Display", "purpose": "Audit title, section headings, brand and verdict."},
+      "body": {"displayName": "Interface Body", "purpose": "Navigation and explanatory prose."},
+      "measurement": {"displayName": "Measurement", "purpose": "Rates, counts, durations and identifiers."}
+    },
+    "shadows": [],
+    "motion": [
+      {"name": "state-fast", "value": "140ms ease", "purpose": "Hover and feedback transitions."},
+      {"name": "progress", "value": "260ms ease", "purpose": "Transform-only audit progress update."}
+    ],
+    "breakpoints": [
+      {"name": "rail-reflow", "value": "1180px"},
+      {"name": "top-navigation", "value": "900px"},
+      {"name": "compact", "value": "720px"},
+      {"name": "narrow", "value": "440px"}
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Compact action used for report recovery and demonstration data.",
+      "html": "<button class=\"ds-button\">LOAD DEMONSTRATION DATA</button>",
+      "css": ".ds-button { min-height: 36px; padding: 0 13px; border: 1px solid #5878de; border-radius: 8px; background: #354fa6; color: #f4f7ff; font-size: 11px; font-weight: 650; cursor: pointer; transition: background-color 140ms ease, border-color 140ms ease; } .ds-button:hover { border-color: #7996f6; background: #415fbe; } .ds-button:focus-visible { outline: 2px solid #7b9cff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Audit Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Flat evidence container with cool-neutral separation.",
+      "html": "<section class=\"ds-panel\"><h2>Output stability</h2><p>Exact and near-identical result rates.</p></section>",
+      "css": ".ds-panel { overflow: hidden; padding: 18px 20px; border: 1px solid #252e3a; border-radius: 12px; background: #10151d; color: #eef3fa; } .ds-panel h2 { margin: 0 0 4px; font: 650 15px/1.3 'Hoistway Plex', sans-serif; } .ds-panel p { margin: 0; color: #909cac; font-size: 11px; }"
+    },
+    {
+      "name": "Pass Status",
+      "kind": "chip",
+      "refersTo": "status-pass",
+      "description": "Measured pass or eligible state.",
+      "html": "<span class=\"ds-status-pass\">PASS</span>",
+      "css": ".ds-status-pass { display: inline-flex; padding: 3px 7px; border: 1px solid #73d2a0; border-radius: 999px; background: rgba(115,210,160,.11); color: #73d2a0; font-size: 9px; font-weight: 700; letter-spacing: .025em; }"
+    },
+    {
+      "name": "Kill Status",
+      "kind": "chip",
+      "refersTo": "status-kill",
+      "description": "Measured kill or excluded state.",
+      "html": "<span class=\"ds-status-kill\">KILL</span>",
+      "css": ".ds-status-kill { display: inline-flex; padding: 3px 7px; border: 1px solid #ff8178; border-radius: 999px; background: rgba(255,129,120,.11); color: #ff8178; font-size: 9px; font-weight: 700; letter-spacing: .025em; }"
+    },
+    {
+      "name": "Current Navigation",
+      "kind": "nav",
+      "description": "Active audit destination with restrained blue emphasis.",
+      "html": "<a class=\"ds-nav-current\" href=\"#\">SUMMARY</a>",
+      "css": ".ds-nav-current { display: inline-block; padding: 9px 12px; border-radius: 7px; background: rgba(123,156,255,.13); color: #bdcaff; font-size: 13px; font-weight: 560; text-decoration: none; } .ds-nav-current:hover { background: #151b24; color: #eef3fa; } .ds-nav-current:focus-visible { outline: 2px solid #7b9cff; outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Flight Recorder",
+    "overview": "Hoistway is a precise, dark technical instrument. It leads with the decision, follows with evidence and ends with the method. Visual emphasis tracks epistemic confidence.",
+    "keyCharacteristics": [
+      "Verdict-first hierarchy with dense evidence beneath it.",
+      "Flat cool-neutral surfaces separated by restrained borders.",
+      "Distinct technical display lettering and monospace measurements.",
+      "Compact controls and explicit audit guardrails.",
+      "Responsive reflow without deleting evidence columns."
+    ],
+    "rules": [
+      {"name": "The Evidence Colour Rule", "body": "Green, red and amber appear only when the product is communicating a measured state.", "section": "colors"},
+      {"name": "The One Accent Rule", "body": "Blue is the only non-semantic interface accent.", "section": "colors"},
+      {"name": "The Measurement Voice Rule", "body": "Numbers and identifiers use monospace; prose does not.", "section": "typography"},
+      {"name": "The Flat Instrument Rule", "body": "Use tonal layering and borders for structure; do not add ambient shadows or glass effects.", "section": "elevation"}
+    ],
+    "dos": [
+      "Do lead with the measured decision and the evidence needed to trust it.",
+      "Do reserve semantic colours for actual audit state.",
+      "Do keep technical values aligned and scannable with monospace type.",
+      "Do expose empty, loading, error and incomplete-audit states.",
+      "Do preserve all evidence on small screens through labelled horizontal scrolling."
+    ],
+    "donts": [
+      "Don't imply that Hoistway caches, modifies or controls traffic.",
+      "Don't use gradients, glass effects, decorative charts or invented operational data.",
+      "Don't use status pills as decoration.",
+      "Don't hide guardrails or canonicalisation assumptions.",
+      "Don't loosen density until evidence relationships become harder to compare."
+    ]
+  }
+}

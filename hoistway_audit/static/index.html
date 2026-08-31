@@ -3,136 +3,217 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0c1015" />
-    <title>Hoistway | Redundancy audit</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230c1015'/%3E%3Cpath d='M18 15v34M46 15v34M18 32h28' stroke='%23edf2f6' stroke-width='6'/%3E%3C/svg%3E" />
+    <meta name="theme-color" content="#0a0d12" />
+    <title>Hoistway redundancy audit</title>
+    <meta name="description" content="A local, read-only redundancy audit for production agent fleets." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0d12'/%3E%3Cpath d='M18 15v34M46 15v34M18 32h28' stroke='%23eef3fa' stroke-width='6'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="/assets/styles.css" />
     <script src="/assets/app.js" defer></script>
   </head>
   <body>
-    <header>
-      <a class="wordmark" href="/">
-        <span class="mark" aria-hidden="true"><i></i><i></i><b></b></span>
-        <span>HOISTWAY</span>
-      </a>
-      <span class="product">48-hour redundancy audit</span>
-      <span class="mode">Read-only</span>
-    </header>
+    <a class="skip-link" href="#main-content">Skip to audit result</a>
 
-    <main>
-      <section class="report-header">
-        <div>
-          <p class="label">Audit result</p>
-          <h1>Cross-session tool-result redundancy</h1>
-          <p class="summary">Observed reuse potential without changing agent behaviour.</p>
-        </div>
-        <div class="progress-block">
-          <div class="progress-copy"><span id="status-text">Collecting</span><span id="elapsed">0 / 48 hours</span></div>
-          <div class="progress-track"><span id="progress"></span></div>
-        </div>
-      </section>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Audit navigation">
+        <a class="brand" href="/report" aria-label="Hoistway audit home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><b></b></span>
+          <span>Hoistway</span>
+        </a>
 
-      <section class="answer" aria-labelledby="answer-heading">
-        <div>
-          <p class="label" id="answer-heading">Cross-session repetition</p>
-          <strong id="cross-session-rate">0%</strong>
-          <p>of non-mutating, session-scoped tool calls repeated across agent sessions</p>
-        </div>
-        <div class="answer-share">
-          <strong id="repeat-share">0%</strong>
-          <p>of all tool calls were stable, cross-session reuse candidates</p>
-        </div>
-      </section>
+        <nav>
+          <a class="nav-link current" href="#summary">Summary</a>
+          <a class="nav-link" href="#stability">Stability</a>
+          <a class="nav-link" href="#candidates">Candidates</a>
+          <a class="nav-link" href="#method">Method</a>
+        </nav>
 
-      <section class="coverage repetition" aria-label="Repetition split">
-        <article><span>Cross-session repeat rate</span><strong id="cross-repeat">0%</strong></article>
-        <article><span>Within-session repeat rate</span><strong id="within-repeat">0%</strong></article>
-        <article><span>Total repeat rate</span><strong id="total-repeat">0%</strong></article>
-        <article><span>Stable eligible repeats</span><strong id="eligible-repeats">0</strong></article>
-      </section>
-
-      <section class="coverage" aria-label="Audit coverage">
-        <article><span>Tool calls</span><strong id="tool-calls">0</strong></article>
-        <article><span>Agent sessions</span><strong id="sessions">0</strong></article>
-        <article><span>Observed tools</span><strong id="tools">0</strong></article>
-        <article><span>Dropped: no session ID</span><strong id="unscoped-calls">0</strong></article>
-      </section>
-
-      <section class="panel timing-panel">
-        <div class="panel-heading">
-          <div><h2>Observed tool-boundary range</h2><p>Secondary timing context, not end-to-end latency saved.</p></div>
-        </div>
-        <div class="timing-grid">
-          <div><span>Lower bound</span><strong id="lower-bound">0 ms</strong></div>
-          <div><span>Upper bound</span><strong id="upper-bound">0 ms</strong></div>
-          <div><span>Eligible calls in multi-call batches</span><strong id="multi-batch-share">0%</strong></div>
-        </div>
-        <p class="batch-distribution" id="batch-distribution"></p>
-        <p class="caveat" id="timing-caveat"></p>
-      </section>
-
-      <section class="panel stability-panel">
-        <div class="panel-heading">
-          <div><h2>Output stability by reuse window</h2><p>Exact and near-identical rates are shown separately.</p></div>
-        </div>
-        <div class="table-wrap">
-          <table class="stability-table">
-            <thead><tr><th>Tool</th><th>Signal</th><th>30s</th><th>1m</th><th>5m</th><th>10m</th><th>1h</th><th>6h</th><th>24h</th><th>Safe window</th></tr></thead>
-            <tbody id="stability-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-heading">
+        <div class="sidebar-note">
+          <span class="state-dot" aria-hidden="true"></span>
           <div>
-            <h2>Measured candidates</h2>
-            <p>Only exact cross-session calls are compared.</p>
-          </div>
-          <div class="key"><span class="key-eligible"></span> Eligible <span class="key-excluded"></span> Excluded</div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Tool pattern</th><th>Calls</th><th>Sessions</th><th>Output stability</th><th>Median boundary</th><th>Repeated boundary</th><th>Decision</th></tr>
-            </thead>
-            <tbody id="candidate-body"></tbody>
-          </table>
-          <div class="empty" id="empty" hidden>
-            <strong>No repeated tool calls observed yet.</strong>
-            <p>Point agent traffic at this proxy and set a session identifier.</p>
-            <button id="seed" type="button">Load demonstration data</button>
+            <strong>Read-only mode</strong>
+            <span>Traffic is observed, never changed.</span>
           </div>
         </div>
-      </section>
 
-      <section class="guardrails">
-        <div><span>Traffic modified</span><strong>No</strong></div>
-        <div><span>Raw payloads stored</span><strong>No</strong></div>
-        <div><span>Output match required</span><strong>Yes</strong></div>
-        <div><span>Mutating tools included</span><strong>No</strong></div>
-      </section>
-
-      <section class="panel rules-panel">
-        <div class="panel-heading">
-          <div><h2>Canonicalisation assumptions</h2><p>Every equivalence rule used before argument digesting.</p></div>
+        <div class="sidebar-footer">
+          <span>Data stays local</span>
+          <span>48-hour audit</span>
         </div>
-        <dl id="rules"></dl>
-      </section>
+      </aside>
 
-      <section class="panel verdict-panel">
-        <div class="panel-heading">
-          <div><h2>Pre-registered verdicts</h2><p>Thresholds fixed before the audit begins.</p></div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Criterion</th><th>Measured</th><th>Threshold</th><th>Verdict</th></tr></thead>
-            <tbody id="verdict-body"></tbody>
-          </table>
-        </div>
-      </section>
-    </main>
+      <div class="workspace">
+        <header class="topbar">
+          <div>
+            <p>Agent fleet</p>
+            <strong>Redundancy audit</strong>
+          </div>
+          <div class="topbar-status" aria-live="polite">
+            <span id="status-text">Loading audit</span>
+            <span id="elapsed">0 / 48 hours</span>
+          </div>
+        </header>
 
-    <footer><span>Hoistway</span><span>Measurement instrument, not a cache</span></footer>
+        <main id="main-content">
+          <div class="error-banner" id="error-banner" role="alert" hidden>
+            <strong>Report unavailable</strong>
+            <span id="error-message">The local audit report could not be loaded.</span>
+            <button id="retry" type="button">Try again</button>
+          </div>
+
+          <section class="summary" id="summary" aria-labelledby="page-title">
+            <div class="summary-heading">
+              <div>
+                <h1 id="page-title">Hoistway redundancy audit</h1>
+                <p>Evidence for whether shared tool-result reuse is justified across this agent fleet.</p>
+              </div>
+              <div class="audit-progress" aria-label="Audit collection progress">
+                <div class="progress-copy">
+                  <span>Collection progress</span>
+                  <strong id="progress-value">0%</strong>
+                </div>
+                <div class="progress-track"><span id="progress"></span></div>
+              </div>
+            </div>
+
+            <div class="primary-result">
+              <div class="result-number">
+                <span>Cross-session repeat rate</span>
+                <strong id="cross-session-rate">0.0%</strong>
+                <p>of non-mutating, session-scoped tool calls</p>
+              </div>
+              <div class="result-decision">
+                <span>Decision thresholds</span>
+                <strong id="overall-verdict">Pending</strong>
+                <p id="verdict-summary">Waiting for audit evidence.</p>
+              </div>
+              <div class="result-evidence">
+                <span>Stable reuse candidates</span>
+                <strong id="eligible-repeats">0</strong>
+                <p id="repeat-share-copy">0.0% of all observed tool calls</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="metric-strip" aria-label="Audit coverage">
+            <div><span>Tool calls</span><strong id="tool-calls">0</strong></div>
+            <div><span>Agent sessions</span><strong id="sessions">0</strong></div>
+            <div><span>Observed tools</span><strong id="tools">0</strong></div>
+            <div><span>Dropped: no session ID</span><strong id="unscoped-calls">0</strong></div>
+          </section>
+
+          <section class="repeat-breakdown" aria-labelledby="repeat-title">
+            <div>
+              <h2 id="repeat-title">Where repetition occurs</h2>
+              <p>Cross-session repetition is the signal that can justify shared infrastructure.</p>
+            </div>
+            <div class="repeat-values">
+              <div><span>Cross-session</span><strong id="cross-repeat">0.0%</strong></div>
+              <div><span>Within-session</span><strong id="within-repeat">0.0%</strong></div>
+              <div><span>Total</span><strong id="total-repeat">0.0%</strong></div>
+            </div>
+          </section>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-main">
+              <section class="panel" id="stability" aria-labelledby="stability-title">
+                <div class="panel-heading">
+                  <div>
+                    <h2 id="stability-title">Output stability</h2>
+                    <p>Exact and near-identical result rates across observed reuse windows.</p>
+                  </div>
+                  <div class="legend" aria-label="Stability signal legend">
+                    <span><i class="legend-exact"></i>Exact</span>
+                    <span><i class="legend-near"></i>Near-identical</span>
+                  </div>
+                </div>
+                <div class="table-wrap" tabindex="0" role="region" aria-label="Output stability evidence table">
+                  <p class="scroll-cue">Scroll horizontally to inspect every reuse window.</p>
+                  <table class="stability-table">
+                    <thead>
+                      <tr><th>Tool</th><th>Signal</th><th>30s</th><th>1m</th><th>5m</th><th>10m</th><th>1h</th><th>6h</th><th>24h</th><th>Safe window</th></tr>
+                    </thead>
+                    <tbody id="stability-body"><tr class="loading-row"><td colspan="10"><span></span></td></tr></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="panel" id="candidates" aria-labelledby="candidate-title">
+                <div class="panel-heading">
+                  <div>
+                    <h2 id="candidate-title">Measured candidates</h2>
+                    <p>Repeated normalised calls evaluated against each tool's stability window.</p>
+                  </div>
+                </div>
+                <div class="table-wrap" tabindex="0" role="region" aria-label="Measured redundancy candidates table">
+                  <p class="scroll-cue">Scroll horizontally to inspect every candidate field.</p>
+                  <table class="candidate-table">
+                    <thead>
+                      <tr><th>Tool pattern</th><th>Calls</th><th>Sessions</th><th>Exact</th><th>Safe window</th><th>Boundary</th><th>Decision</th></tr>
+                    </thead>
+                    <tbody id="candidate-body"><tr class="loading-row"><td colspan="7"><span></span></td></tr></tbody>
+                  </table>
+                  <div class="empty-state" id="empty" hidden>
+                    <strong>No repeated tool calls yet</strong>
+                    <p>Send agent traffic through the proxy with a Hoistway session identifier.</p>
+                    <button id="seed" type="button">Load demonstration data</button>
+                    <small>Demonstration data replaces current local observations.</small>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <aside class="dashboard-side" aria-label="Audit decision and timing">
+              <section class="side-panel verdict-panel" aria-labelledby="verdict-title">
+                <div class="side-heading">
+                  <h2 id="verdict-title">Pre-registered verdicts</h2>
+                  <p>These thresholds were fixed before collection.</p>
+                </div>
+                <div id="verdict-body" class="verdict-list"></div>
+              </section>
+
+              <section class="side-panel timing-panel" aria-labelledby="timing-title">
+                <div class="side-heading">
+                  <h2 id="timing-title">Tool-boundary context</h2>
+                  <p>A bounded observation, not a latency-savings claim.</p>
+                </div>
+                <dl class="timing-values">
+                  <div><dt>Lower bound</dt><dd id="lower-bound">0 ms</dd></div>
+                  <div><dt>Upper bound</dt><dd id="upper-bound">0 ms</dd></div>
+                  <div><dt>Eligible calls in multi-call batches</dt><dd id="multi-batch-share">0.0%</dd></div>
+                </dl>
+                <p class="batch-distribution" id="batch-distribution">No batch evidence yet.</p>
+                <details>
+                  <summary>How to interpret this range</summary>
+                  <p id="timing-caveat"></p>
+                </details>
+              </section>
+            </aside>
+          </div>
+
+          <section class="method" id="method" aria-labelledby="method-title">
+            <div class="method-heading">
+              <h2 id="method-title">Trust the measurement</h2>
+              <p>The report exposes what it stores, excludes and assumes.</p>
+            </div>
+            <div class="guardrail-grid">
+              <div><span>Traffic modified</span><strong>No</strong></div>
+              <div><span>Raw payloads stored</span><strong>No</strong></div>
+              <div><span>Mutation-like tools eligible</span><strong>No</strong></div>
+              <div><span>Cross-session evidence required</span><strong>Yes</strong></div>
+            </div>
+            <details class="rules-panel">
+              <summary>Canonicalisation assumptions</summary>
+              <p>Every equivalence rule applied before argument digesting.</p>
+              <dl id="rules"></dl>
+            </details>
+          </section>
+        </main>
+
+        <footer>
+          <span>Hoistway</span>
+          <span>Measurement instrument, not a cache</span>
+        </footer>
+      </div>
+    </div>
   </body>
 </html>
